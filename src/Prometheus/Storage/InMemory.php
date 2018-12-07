@@ -116,12 +116,13 @@ class InMemory implements Adapter
                 'labelNames' => $metaData['labelNames'],
             ];
             foreach ($metric['samples'] as $key => $value) {
-                $parts = explode(':', $key);
-                $labelValues = $parts[2];
+                $labelPairMatches = [];
+                preg_match('/({\".+\":\".+\"})/', $key, $labelPairMatches);
+                $labelValues = json_decode($labelPairMatches[1], true);
                 $data['samples'][] = [
                     'name' => $metaData['name'],
-                    'labelNames' => [],
-                    'labelValues' => $this->decodeLabelValues($labelValues),
+                    'labelNames' => array_keys($labelValues),
+                    'labelValues' => $labelValues,
                     'value' => $value
                 ];
             }
