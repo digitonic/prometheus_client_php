@@ -1,6 +1,10 @@
 {
-    "name": "jimdo/prometheus_client_php",
+    "name": "digitonic/prometheus_client_php",
     "authors": [
+        {
+            name: "Yannick",
+            "email": "yannick@digitonic.co.uk"
+        },
         {
             "name": "Joscha",
             "email": "joscha@schnipseljagd.org"
