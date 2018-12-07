@@ -67,7 +67,7 @@ class InMemory implements Adapter
                     if (!isset($histogramBuckets[$labelValues][$bucket])) {
                         $data['samples'][] = [
                             'name' => $metaData['name'] . '_bucket',
-                            'labelNames' => ['le'],
+                            'labelNames' => array_merge(array_keys($decodedLabelValues), ['le']),
                             'labelValues' => array_merge($decodedLabelValues, [$bucket]),
                             'value' => $acc
                         ];
@@ -75,7 +75,7 @@ class InMemory implements Adapter
                         $acc += $histogramBuckets[$labelValues][$bucket];
                         $data['samples'][] = [
                             'name' => $metaData['name'] . '_' . 'bucket',
-                            'labelNames' => ['le'],
+                            'labelNames' => array_merge(array_keys($decodedLabelValues), ['le']),
                             'labelValues' => array_merge($decodedLabelValues, [$bucket]),
                             'value' => $acc
                         ];
@@ -85,7 +85,7 @@ class InMemory implements Adapter
                 // Add the count
                 $data['samples'][] = [
                     'name' => $metaData['name'] . '_count',
-                    'labelNames' => [],
+                    'labelNames' => array_keys($decodedLabelValues),
                     'labelValues' => $decodedLabelValues,
                     'value' => $acc
                 ];
@@ -93,7 +93,7 @@ class InMemory implements Adapter
                 // Add the sum
                 $data['samples'][] = [
                     'name' => $metaData['name'] . '_sum',
-                    'labelNames' => [],
+                    'labelNames' => array_keys($decodedLabelValues),
                     'labelValues' => $decodedLabelValues,
                     'value' => $histogramBuckets[$labelValues]['sum']
                 ];
@@ -116,13 +116,13 @@ class InMemory implements Adapter
                 'labelNames' => $metaData['labelNames'],
             ];
             foreach ($metric['samples'] as $key => $value) {
-                $labelPairMatches = [];
-                preg_match('/({\".+\":\".+\"})/', $key, $labelPairMatches);
-                $labelValues = json_decode($labelPairMatches[1], true);
+                $parts = explode(':', $key);
+                $labelValues = $parts[2];
+                $decodeLabelValues = $this->decodeLabelValues($labelValues);
                 $data['samples'][] = [
                     'name' => $metaData['name'],
-                    'labelNames' => array_keys($labelValues),
-                    'labelValues' => $labelValues,
+                    'labelNames' => array_keys($decodeLabelValues),
+                    'labelValues' => $decodeLabelValues,
                     'value' => $value
                 ];
             }

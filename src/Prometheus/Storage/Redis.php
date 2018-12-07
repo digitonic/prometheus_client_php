@@ -239,7 +239,7 @@ LUA
                     if (!isset($raw[$bucketKey])) {
                         $histogram['samples'][] = array(
                             'name' => $histogram['name'] . '_bucket',
-                            'labelNames' => array('le'),
+                            'labelNames' => array_merge(array_keys($labelValues), array('le')),
                             'labelValues' => array_merge($labelValues, array($bucket)),
                             'value' => $acc
                         );
@@ -247,7 +247,7 @@ LUA
                         $acc += $raw[$bucketKey];
                         $histogram['samples'][] = array(
                             'name' => $histogram['name'] . '_bucket',
-                            'labelNames' => array('le'),
+                            'labelNames' => array_merge(array_keys($labelValues), array('le')),
                             'labelValues' => array_merge($labelValues, array($bucket)),
                             'value' => $acc
                         );
@@ -257,7 +257,7 @@ LUA
                 // Add the count
                 $histogram['samples'][] = array(
                     'name' => $histogram['name'] . '_count',
-                    'labelNames' => array(),
+                    'labelNames' => array_keys($labelValues),
                     'labelValues' => $labelValues,
                     'value' => $acc
                 );
@@ -265,7 +265,7 @@ LUA
                 // Add the sum
                 $histogram['samples'][] = array(
                     'name' => $histogram['name'] . '_sum',
-                    'labelNames' => array(),
+                    'labelNames' => array_keys($labelValues),
                     'labelValues' => $labelValues,
                     'value' => $raw[json_encode(array('b' => 'sum', 'labelValues' => $labelValues))]
                 );
@@ -286,10 +286,11 @@ LUA
             unset($raw['__meta']);
             $gauge['samples'] = array();
             foreach ($raw as $k => $value) {
+                $decodedLabels = json_decode($k, true);
                 $gauge['samples'][] = array(
                     'name' => $gauge['name'],
-                    'labelNames' => array(),
-                    'labelValues' => json_decode($k, true),
+                    'labelNames' => array_keys($decodedLabels),
+                    'labelValues' => $decodedLabels,
                     'value' => $value
                 );
             }
@@ -312,10 +313,11 @@ LUA
             unset($raw['__meta']);
             $counter['samples'] = array();
             foreach ($raw as $k => $value) {
+                $decodedLabels = json_decode($k, true);
                 $counter['samples'][] = array(
                     'name' => $counter['name'],
-                    'labelNames' => array(),
-                    'labelValues' => json_decode($k, true),
+                    'labelNames' => array_keys($decodedLabels),
+                    'labelValues' => $decodedLabels,
                     'value' => $value
                 );
             }
